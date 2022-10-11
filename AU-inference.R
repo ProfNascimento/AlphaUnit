@@ -57,8 +57,27 @@ fit=stan(model_code=stanmodel,
          data=list(N=length(InflationUnit$Inflation), 
                    Y=InflationUnit$Inflation),
          iter=1000,chain=1)
-
 summary(fit)
+
+hist(as.matrix(fit)[,1])
+## MEAN POSTERIOR
+mean(as.matrix(fit)[,1])
+## MEDIAN POSTERIOR
+median(as.matrix(fit)[,1])
+## MODE POSTERIOR
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+getmode(as.matrix(fit)[,1])
 
 require(shinystan)
 launch_shinystan(fit)
+
+## AU MEAN
+eAU=function(x,alpha){
+  2*exp(alpha^2/2)*(alpha^2*dnorm(alpha)+(1-pnorm(alpha)-2*alpha*dnorm(alpha)+alpha^2*(1-pnorm(alpha))))}
+# AVERAGE CLASSIC
+eAU(InflationUnit$Inflation,est0$estimate)
+# AVERAGE BAYES (POSTERIOR MEAN)
+eAU(InflationUnit$Inflation,mean(as.matrix(fit)[,1]))
